@@ -35,10 +35,4 @@ public class MyGraph {
         return graph;
     }
 
-    public void setGraph(Graph<MyClass, DependencyEdge> graph) {
-        this.graph = graph;
-    }
-
-
-
 }

@@ -1,10 +1,6 @@
 import re
 import math
 import logging
-import javalang
-
-from StringUtils import StringUtils
-from multipledispatch import dispatch
 
 
 class Class:
@@ -24,21 +20,12 @@ class Class:
         self.implemented_types = implemented_types
         self.extended_types = extended_types
 
-    def extract_comments(self, string):
-        self.comments = StringUtils.extract_comments_from_string(string)
-
     def total_words(self, array):
         # Could be more precise using regex, not a big deal
         return sum(len(sentence.split()) for sentence in array)
 
     def get_merge_of_entities(self):
         logging.info(f"Dependencies: {self.dependencies}")
-        dependencies = [dep[0] for dep in self.dependencies]
-
-        # TODO : estava a considerar o uso das dependencias antes? Voltar a utilizar?!
-
-        # len_words = self.total_words(dependencies) + self.total_words(self.variables) + self.total_words(
-        #     self.methods) + self.total_words(self.formal_parameters) + self.total_words(self.literals) + self.total_words(self.comments) + 1
 
         pattern_match_class_name = r'\.(\w*)$'
 
@@ -89,26 +76,11 @@ class Class:
         string = " ".join(string) + class_name_weight * (" " + self.class_name)
         return string
 
-    def get_class_name(self):
-        return self.class_name
-
     def get_qualified_name(self):
         return self.qualified_name
 
     def get_dependencies(self):
         return self.dependencies
-
-    def get_methods(self):
-        return self.methods
-
-    def get_variables(self):
-        return self.variables
-
-    def get_literals(self):
-        return self.literals
-
-    def get_package_name(self):
-        return self.package_name
 
     def get_method_invocations(self):
         return self.method_invocations

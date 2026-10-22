@@ -24,24 +24,8 @@ public class MyMethod {
         this.parametersDataType = new ArrayList<>();
     }
 
-    public MyMethod(String name, List<String> parametersDataType, String returnDataType) {
-        this.name = name;
-        this.setParametersDataType(parametersDataType);
-        this.setReturnDataType(Collections.singletonList(returnDataType));
-    }
-
-    public MyMethod(String name, List<String> parametersDataType, List<String> returnDataType) {
-        this.name = name;
-        this.setParametersDataType(parametersDataType);
-        this.setReturnDataType(returnDataType);
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public List<String> getParametersDataType() {
@@ -50,10 +34,6 @@ public class MyMethod {
 
     public void setParametersDataType(List<String> parametersDataType) {
         this.parametersDataType = parametersDataType.stream().filter(s -> !Constants.STOP_WORDS_DATA_TYPES.contains(s.toLowerCase())).collect(Collectors.toList());
-    }
-
-    public List<String> getReturnDataType() {
-        return returnDataType;
     }
 
     public void setReturnDataType(List<String> returnDataType) {

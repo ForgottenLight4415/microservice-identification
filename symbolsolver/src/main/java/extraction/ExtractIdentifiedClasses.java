@@ -1,7 +1,5 @@
 package extraction;
 
-import graph.entities.MyClass;
-
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

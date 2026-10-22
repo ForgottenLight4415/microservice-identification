@@ -4,10 +4,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MarkerAnnotationExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.google.gson.annotations.Expose;
-import javassist.expr.MethodCall;
 
-import java.io.Serializable;
 import java.util.*;
 
 public class MyClass {
@@ -22,19 +19,6 @@ public class MyClass {
     private Set<String> implementedTypes;
     private Set<String> extendedTypes;
     private Service service;
-
-    public MyClass(String qualifiedName) {
-        this.qualifiedName = qualifiedName;
-        this.methods = new HashMap<>();
-        this.operations = new HashSet<>();
-        this.implementedTypes = new HashSet<>();
-        this.extendedTypes = new HashSet<>();
-    }
-
-    public MyClass(String qualifiedName, Service service) {
-        this(qualifiedName);
-        this.service = service;
-    }
 
     public MyClass(ClassOrInterfaceDeclaration visitor) {
         this.methods = new HashMap<>();
@@ -63,24 +47,12 @@ public class MyClass {
         return methods;
     }
 
-    public void setMethods(Map<String, MyMethod> methods) {
-        this.methods = methods;
-    }
-
     public Set<String> getOperations() {
         return operations;
     }
 
     public void setOperations(Set<String> operations) {
         this.operations = operations;
-    }
-
-    public void setVisitor(ClassOrInterfaceDeclaration visitor) {
-        this.visitor = visitor;
-    }
-
-    public boolean isServiceInterface() {
-        return !operations.isEmpty();
     }
 
     public Service getService() {
@@ -151,10 +123,5 @@ public class MyClass {
     @Override
     public int hashCode() {
         return Objects.hash(qualifiedName);
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        return super.clone();
     }
 }

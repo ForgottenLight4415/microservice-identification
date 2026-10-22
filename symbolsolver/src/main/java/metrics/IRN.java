@@ -5,12 +5,8 @@ import graph.entities.MyClass;
 import graph.MyGraph;
 import graph.entities.Service;
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultUndirectedGraph;
 import parser.ParseResultServices;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Coupling Metric
@@ -93,9 +89,5 @@ public class IRN implements Metric {
         System.out.println("Total: " + total);
 
         return totalIrn;
-    }
-
-    public MyGraph getMyGraph() {
-        return myGraph;
     }
 }

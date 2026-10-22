@@ -103,7 +103,6 @@ def Metric_msg_cohesion(clusterID):
     else:
         from itertools import combinations
         apiIDPairList = list(combinations(apiIDList, 2))
-        fenmu = len(apiIDPairList)  # perfect graph's edge number
         apiSimList = list()
         for apiPair in apiIDPairList:
             [para_interset, return_interset] = GetIntersect(
@@ -115,7 +114,6 @@ def Metric_msg_cohesion(clusterID):
                 para_interset, para_unionset)
             [return_unweight, return_weight] = GetEdge_half(
                 return_interset, return_unionset)
-            # FEITO
             if para_weight != -1 and return_weight != -1:
                 sim = (para_weight + return_weight) / float(2.0)
                 apiSimList.append(sim)
@@ -149,7 +147,6 @@ def calculate(apiFileName):
     [g_clusterID2Interf2APIDict, g_apiDict] = ReadAPIFile(apiFileName)
     msg_cohesion_wei_list = list()
     if len(g_clusterID2Interf2APIDict) == 0:
-        print(str(1))
         return 1
     else:
         for clusterID in g_clusterID2Interf2APIDict:
@@ -158,19 +155,6 @@ def calculate(apiFileName):
             msg_cohesion_wei_list.append(msg_cohesion_wei)
         msg_avg_wei = sum(msg_cohesion_wei_list) / \
             float(len(msg_cohesion_wei_list))
-
-        interface_number = 0
-        for clusterID in g_clusterID2Interf2APIDict:
-            interface_number += len(g_clusterID2Interf2APIDict[clusterID])
-        #print ('interface number=', interface_number)
-        # tmp = ['avg_msg_cohesion', str(msg_avg_wei), 'interface_numb', str(
-        #     interface_number), 'clusterHasinf', str(len(g_clusterID2Interf2APIDict))]
-        # print(','.join(tmp))
-
-        # print apidetail, using do and m_cohesion_wei_list interface_number_list
-        #print('\ninterface msg cohesion detail:')
-        # for index in range(0, len(msg_cohesion_wei_list)):
-        #    print(msg_cohesion_wei_list[index])
         print(f"CHM: {msg_avg_wei}")
         return msg_avg_wei
 

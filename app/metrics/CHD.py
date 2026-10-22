@@ -241,27 +241,8 @@ def calculate(apiFileName):
         avg_dom_cohesion_wei = sum(
             dom_cohesion_wei_list) / float(len(dom_cohesion_wei_list))
 
-        interface_number = 0
-        interface_number_list = list()
-        for clusterID in g_clusterID2Interf2APIDict:
-            interface_number += len(g_clusterID2Interf2APIDict[clusterID])
-            interface_number_list.append(
-                len(g_clusterID2Interf2APIDict[clusterID]))
-        # tmp = ['avg_dom_cohesion', str(avg_dom_cohesion_wei), 'interface_number', str(
-        #     interface_number), 'clusterHasinf', str(len(g_clusterID2Interf2APIDict))]
-        # print(','.join(tmp))
         print(f"CHD: {avg_dom_cohesion_wei}")
         return avg_dom_cohesion_wei
-
-        '''
-        # print apidetail, using do and m_cohesion_wei_list interface_number_list
-        print('\ninterface dom cohesion detail:')
-        for index in range(0, len(dom_cohesion_wei_list)):
-            print(dom_cohesion_wei_list[index])
-        print('\ninterface number detail:')
-        for index in range(0, len(dom_cohesion_wei_list)):
-            print(interface_number_list[index])
-        '''
 
 
 if __name__ == '__main__':

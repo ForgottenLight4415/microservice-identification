@@ -12,14 +12,9 @@ import metrics.CMQ as CMQ
 class MetricExecutor:
 
     def __init__(self):
-        super().__init__()
         self.projects = []
         self.commit_hash = ''
         # self.commit_hash = str(subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]))
-
-    def write_to_file(self, path, content, type="w"):
-        with open(path, type) as f:
-            f.write(content)
 
     def add_project(self, project_name, cluster_string):
         project = {}
@@ -38,9 +33,6 @@ class MetricExecutor:
     def run_metrics(self):
         # Runs java method responsible for calculating OPN and IRN and extracting method invocations in order to calculate
         # CHM and CHD. Resorts to the projects.json written above as input.
-
-        # subprocess.call(f"java -Dmetrics -cp symbolsolver-1.0.jar Main",
-        # cwd=f"{Settings.DIRECTORY}/symbolsolver/target/", shell=True)
 
         output = subprocess.check_output(f"java -Dmetrics -Dproject={Settings.PROJECT_PATH} -cp symbolsolver-1.0.jar Main",
                                          cwd=f"{Settings.DIRECTORY}/symbolsolver/target/", shell=True)
@@ -68,14 +60,6 @@ class MetricExecutor:
         ifn = IFN.calculate(file_path)
         smq, scoh, scop = SMQ.calculateWrapper()
         cmq, ccoh, ccop = CMQ.calculateWrapper()
-
-        # path = f"{Settings.DIRECTORY}/data/services/{Settings.PROJECT_NAME}/{Settings.PROJECT_NAME}_{Settings.ID}_K{Settings.K_TOPICS}.csv"
-        # with open(path, "a+") as f:
-        #     f.write(f"\nCHM: {chm}")
-        #     f.write(f"\nCHD: {chd}")
-        #     f.write(f"\nIFN: {ifn}")
-        #     f.write(f"\nSMQ: {smq}")
-        #     f.write(f"\nCMQ: {cmq}")
 
         print(f"FINAL CHM : {chm}")
         print(f"FINAL CHD : {chd}")

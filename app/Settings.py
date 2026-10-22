@@ -13,7 +13,6 @@ class Settings:
 
     DIRECTORY_PROJECTS = f"{DIRECTORY}/projects.json"
     LDA_PLOTTING = False
-    METRIC_EVALUATION = False
 
     PROJECT_PATH = ''
     STOP_WORDS_PATH = ''

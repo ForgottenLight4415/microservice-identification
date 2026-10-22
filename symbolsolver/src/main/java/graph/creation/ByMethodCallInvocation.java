@@ -10,8 +10,6 @@ import parser.ParseResultServices;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ByMethodCallInvocation extends MyGraph {
@@ -39,10 +37,6 @@ public class ByMethodCallInvocation extends MyGraph {
                         ResolvedType resolvedType = rs.calculateResolvedType();
                         MyClass target = classes.get(resolvedType.asReferenceType().getQualifiedName());
 
-                        //if(isMethodCallGetterOrSetter(methodCall)) {
-                        // return;
-                        // }
-
                         DependencyEdge edge = getGraph().getEdge(source, target);
                         if (isValidClass(target.getQualifiedName(), validClasses)) {
                             if (edge == null) {
@@ -59,12 +53,6 @@ public class ByMethodCallInvocation extends MyGraph {
             }
         }
 
-    }
-
-    private boolean isMethodCallGetterOrSetter(MethodCallExpr exp) {
-        Matcher matchGet = Pattern.compile("^get").matcher(exp.getNameAsString());
-        Matcher matchSet = Pattern.compile("^set").matcher(exp.getNameAsString());
-        return (matchGet.find() && exp.getArguments().size() == 0) || (matchSet.find() && exp.getArguments().size() == 1);
     }
 
     private boolean isValidClass(String qualifiedName, Set<String> validClasses) {

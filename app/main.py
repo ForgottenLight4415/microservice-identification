@@ -1,78 +1,18 @@
-from sklearn.cluster import DBSCAN, FeatureAgglomeration, AffinityPropagation
-from sklearn.mixture import GaussianMixture
-from datetime import datetime
-from itertools import cycle
-from random import randint
-from random import random
-from kneed import KneeLocator
-import matplotlib.pyplot as plt
 import Utils as utils
 import networkx as nx
-import javalang
-import logging
-import numpy as np
-import LDA as lda
-import collections
-import community
 import argparse
 import json
-import math
-import re
 import os
-import PostProcessing
-import time
-
+import LDA as lda
 
 from metrics.Metrics import Metrics
 from metrics.MetricExecutor import MetricExecutor
-from Utils import normalize
-from StringUtils import StringUtils
 from Graph import Graph
-from operator import itemgetter
-from TfIdf import TfIdf
 from WeightType import WeightType
 from Clustering import Clustering
-from visitors.ClassVisitor import ClassVisitor
 from entities.Method import Method
 from entities.Class import Class
-from entities.Service import Service
 from Settings import Settings
-
-
-def read_files(files):
-    read_files = {}
-    for f in files:
-
-        with open(f, 'r') as reader:
-            matches = re.search(r"\/(?P<class_name>\w*)\.java", str(f))
-            if matches:
-                class_name = matches.groupdict()['class_name']
-                read_files[class_name] = {}
-                read_files[class_name]["fullpath"] = str(f)
-                read_files[class_name]["text"] = reader.read()
-
-    return read_files
-
-
-def parse_files_to_ast(read_files):
-    class_visitors = {}
-
-    for file_name, values in read_files.items():
-        logging.info(f"Pagraphsing file {values['fullpath']}")
-        try:
-            tree = javalang.parse.parse(values["text"])
-        except javalang.parser.JavaSyntaxError:
-            logging.error(f"Failed to parse file: {values['fullpath']}")
-
-        visitor = ClassVisitor()
-        visitor.extract_comments(values["text"])
-
-        for _, node in tree:
-            visitor.visit(node)
-
-        class_visitors[visitor.get_class_name()] = visitor
-
-    return class_visitors
 
 
 def calculate_absolute_weights(graph, classes, weight_type=WeightType.TF_IDF):
@@ -86,16 +26,12 @@ def calculate_absolute_weights(graph, classes, weight_type=WeightType.TF_IDF):
 
         # If the dependency is of type EXTENDS, IMPLEMENTS or STATIC (less common than NORMAL)
         primary_types = {'EXTENDS', 'IMPLEMENTS', 'STATIC'}
-        # secondary_types = {'STATIC'}
 
         # TODO : consider just removing the edge and adding it after clustering
         try:
             if edge_data["dependency_type"] in primary_types:
                 edge_data[str(WeightType.ABSOLUTE)] = float(1)
             else:
-                # edge_data[str(WeightType.ABSOLUTE)
-                #           ] = float(edge_data[str(weight_type)])
-
                 method_call_weight = 0
                 if src in classes:
                     classe = classes[src]
@@ -117,87 +53,6 @@ def calculate_absolute_weights(graph, classes, weight_type=WeightType.TF_IDF):
             # TODO : review why does this only happens on a specific case
             edge_data[str(WeightType.ABSOLUTE)] = 0
             print(f"KEY ERROR {e} {src} {dst}")
-
-
-def apply_tfidf_to_connections(graph, class_visitors):
-
-    edges = graph.edges()
-
-    tf_idf = TfIdf()
-    for src, dst in edges:
-        source = class_visitors[src].get_merge_of_entities()
-        destination = class_visitors[dst].get_merge_of_entities()
-
-        similarity = round(tf_idf.apply_tfidf_to_pair(source, destination), 2)
-        logging.info(f"{similarity} {src} - {dst}")
-
-        graph[src][dst][str(WeightType.TF_IDF)] = similarity
-
-
-def prepare_matrix(graph, weight_type=WeightType.ABSOLUTE):
-    # https://stackoverflow.com/questions/49064611/how-to-find-different-groups-in-networkx-using-python
-    # X = nx.to_numpy_matrix(graph, weight=WEIGHT)
-
-    g = Graph.to_undirected(graph)
-    nn = len(g.nodes)
-
-    mat = np.empty((nn, nn), dtype=float)
-    mat.fill(-50)  # -50?
-    np.fill_diagonal(mat, -0.0)
-
-    node_to_int = {node: index for index, node in enumerate(g.nodes)}
-
-    for u, v in g.edges:
-        weight = (g.get_edge_data(u, v)[weight_type])
-        u = node_to_int[u]
-        v = node_to_int[v]
-
-        mat[u, v] = -50 * (1 - weight)
-
-    np.median(mat)
-
-    return mat, node_to_int
-
-
-# TODO : Investigate other methods of clustering
-# https://scikit-learn.org/stable/modules/classes.html#module-sklearn.cluster
-def community_detection_by_affinity(graph, weight_type=WeightType.ABSOLUTE):
-
-    # Has an high impact on Girvan Newman clustering
-    graph = nx.algorithms.tree.mst.maximum_spanning_tree(
-        Graph.to_undirected(graph))
-
-    mat, node_to_int = prepare_matrix(graph)
-
-    af = AffinityPropagation(preference=-50)
-    labels = af.fit_predict(mat)
-
-    inv_node_to_int = {v: k for k, v in node_to_int.items()}
-
-    clusters = {}
-    for index, lab in enumerate(labels):
-        class_name = inv_node_to_int[index]
-        if lab not in clusters:
-            clusters[lab] = []
-        clusters[lab].append(class_name)
-
-    print(f"\nClusters: {clusters}")
-    print(f"Total Clusters: {len(clusters)}")
-
-    pos = nx.spring_layout(graph)
-    nx.draw_networkx(graph, pos=pos, edgelist=[], node_color=labels, with_labels=True,
-                     node_size=250, font_size=8)
-
-    return [cluster for cluster in clusters.values()]
-
-
-def visitors_to_qualified_name(visitors):
-    qualified_visitors = {}
-    for class_name, visitor in visitors.items():
-        qualified_name = f"{visitor.get_package_name()}.{class_name}"
-        qualified_visitors[qualified_name] = visitor
-
-    return qualified_visitors
 
 
 def extract_classes_information_from_parsed_json(json_dict):
@@ -245,7 +100,6 @@ def identify_clusters_in_project(project_name, project_path):
     utils.execute_parser(project_path)
 
     # Read parsed document
-    parsed_raw_json = {}
     with open(temp_json_location) as json_file:
         parsed_raw_json = json.load(json_file)
 
@@ -272,8 +126,6 @@ def identify_clusters_in_project(project_name, project_path):
         clusters_results = Clustering.compute_multiple_resolutions(
             graph, start=0.3, end=1.1, step=0.1)
 
-    # TODO: Reconsider techniques of post-processing
-    # clusters = PostProcessing.process(clusters, classes, graph.copy())
     return clusters_results
 
 
@@ -332,42 +184,6 @@ def main():
 
         if args.metrics:
             metrics.save()
-
-
-def build_plot(resolution, chm, chd, ifn, smq, cmq, irn, opn):
-    # Plot 1
-    bar_width = 1/6
-    r1 = np.arange(len(resolution))
-    r2 = [x + bar_width for x in r1]
-    r3 = [x + bar_width for x in r2]
-    r4 = [x + bar_width for x in r3]
-    r5 = [x + bar_width for x in r4]
-
-    plt.subplot(1, 2, 1)
-    plt.bar(r1, chm, width=bar_width, label='chm')
-    plt.bar(r2, chd, width=bar_width, label='chd')
-    plt.bar(r3, ifn, width=bar_width, label='ifn')
-    plt.bar(r4, smq, width=bar_width, label='smq')
-    plt.bar(r5, cmq, width=bar_width, label='cmq')
-    plt.xlabel('resolution', fontweight='bold')
-    plt.xticks([r + bar_width for r in range(len(resolution))],
-               resolution)
-    plt.legend()
-
-    # Plot 2
-    bar_width = 1/3
-    r6 = np.arange(len(resolution))
-    r7 = [x + bar_width for x in r6]
-
-    plt.subplot(1, 2, 2)
-    plt.bar(r6, irn, width=bar_width, label='irn')
-    plt.bar(r7, opn, width=bar_width, label='opn')
-    plt.xlabel('resolution', fontweight='bold')
-    plt.xticks([r + bar_width for r in range(len(resolution))],
-               resolution)
-    plt.legend()
-
-    return plt
 
 
 main()

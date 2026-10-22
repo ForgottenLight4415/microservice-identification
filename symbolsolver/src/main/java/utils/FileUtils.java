@@ -2,15 +2,11 @@ package utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import constants.Constants;
-import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 
 public class FileUtils {

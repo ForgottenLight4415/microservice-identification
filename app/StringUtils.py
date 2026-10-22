@@ -1,17 +1,9 @@
 import re
-import time
-import pathlib
 
-from pathlib import Path
 from Settings import Settings
 
 
 class StringUtils:
-
-    @staticmethod
-    def search_java_files(directory):
-        files = list(Path(directory).rglob('*.java'))
-        return [file for file in files if len(re.findall(r'[Tt]ests?', str(file))) == 0]
 
     @staticmethod
     def remove_comment(comment):
@@ -64,7 +56,6 @@ class StringUtils:
         result_words = []
         uncamel_words = re.sub(r'(?<!^)(?=[A-Z])', ' ', string).lower()
         words = re.split(r"\W+", uncamel_words)
-        # with open('file', 'a+') as f:
         for word in words:
             if word.isalpha() and word.lower() not in stopwords and len(word) > 2:
                 result_words.append(word)

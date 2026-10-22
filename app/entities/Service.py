@@ -11,26 +11,9 @@ class Service:
         else:
             self.id = service_id
         self.classes = set(classes)
-        self.external_classes_dependencies = {}
-        self.service_dependencies = {}
 
     def get_classes(self):
         return self.classes
-
-    def set_classes(self, classes):
-        self.classes = classes
-
-    def set_external_classes_dependencies(self, dependencies):
-        self.external_classes_dependencies = dependencies
-
-    def get_external_classes_dependencies(self):
-        return self.external_classes_dependencies
-
-    def get_service_dependencies(self):
-        return self.service_dependencies
-
-    def set_service_dependencies(self, dependencies):
-        self.service_dependencies = dependencies
 
     @staticmethod
     def extract_services_from_clusters(clusters):

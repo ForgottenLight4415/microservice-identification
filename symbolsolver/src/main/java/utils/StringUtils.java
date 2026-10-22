@@ -1,13 +1,8 @@
 package utils;
 
-import com.github.javaparser.ast.body.CallableDeclaration;
-import com.github.javaparser.ast.nodeTypes.*;
-import com.google.common.base.Strings;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import graph.entities.MyClass;
-import graph.entities.Service;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -39,13 +34,6 @@ public class StringUtils {
                 .collect(Collectors.toList());
     }
 
-    public static boolean isMethodCallGetterOrSetter(String name, int parametersSize) {
-        Matcher matchGet = Pattern.compile("^get").matcher(name);
-        Matcher matchSet = Pattern.compile("^set").matcher(name);
-        Matcher matchBoolean = Pattern.compile("^is").matcher(name);
-        return (matchGet.find() && parametersSize == 0) || (matchSet.find() && parametersSize == 1) || (matchBoolean.find() && parametersSize == 0);
-    }
-
     public static List<String> filterStopWords(List<String> words, Set<String> stopWords){
         return words.stream().filter(word -> !stopWords.contains(word)).collect(Collectors.toList());
     }
@@ -68,32 +56,6 @@ public class StringUtils {
         return clusters;
     }
 
-
-    public static Map<Integer, Service> extractClustersToServices(String string) {
-
-        Map<String, Integer> clustersFromString = readClustersFromString(string);
-        Map<Integer, Service> clusters = new HashMap<>();
-
-        for (Map.Entry<String, Integer> entry : clustersFromString.entrySet()) {
-
-            // TODO : clean this up
-            if (clusters.containsKey(entry.getValue())) {
-                clusters.get(entry.getValue()).getClasses().put(entry.getKey(),
-                        new MyClass(entry.getKey(), clusters.get(entry.getValue())));
-            } else {
-                Service service = new Service(entry.getValue());
-                service.getClasses().put(entry.getKey(), new MyClass(entry.getKey(), service));
-                clusters.put(service.getId(), service);
-            }
-
-        }
-
-        return clusters;
-    }
-
-    public static Set<String> extractCamelCase(String string) {
-        return new HashSet<>(Arrays.asList(string.split("(?<=[a-z])(?=[A-Z])")));
-    }
 
     public static List<String> extractVariableType(String string) {
 

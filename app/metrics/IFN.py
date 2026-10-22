@@ -7,7 +7,6 @@ def calculate(api_file_name):
         line = f.readline()
         while line:
             data = line.split(',')
-            print(data[1])
             if data[0] in services:
                 services[data[0]].add(data[1])
             else:

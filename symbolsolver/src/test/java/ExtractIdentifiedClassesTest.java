@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.*;
 
 
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ExtractIdentifiedClassesTest {
 
@@ -68,20 +67,6 @@ public class ExtractIdentifiedClassesTest {
             e.printStackTrace();
         }
 
-    }
-
-
-    //@Test
-    public void shouldExtractListOfControllers() {
-        List<String> classes = Arrays.asList("com.controllers.Teste", "com.controllers.something.else.ClassA",
-                "org.another.one.ClassControllers", "com.something.else", "com", "org.teste.Teste",
-                "com.controllers.testeController", "com.Controllers.Class");
-        List<String> patterns = Arrays.asList("(?i)controllers?");
-        ExtractIdentifiedClasses extract = new ExtractIdentifiedClasses();
-        List<String> matchingClasses = extract.extractFilterBased(classes, patterns);
-        List<String> expectedMatches = Arrays.asList("com.controllers.Teste", "com.controllers.something.else.ClassA",
-                "org.another.one.ClassControllers", "com.controllers.testeController", "com.Controllers.Class");
-        assertEquals(matchingClasses, expectedMatches);
     }
 
 }

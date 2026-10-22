@@ -5,22 +5,16 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
-import com.github.javaparser.resolution.types.ResolvedType;
-import edu.stanford.nlp.pipeline.CoreDocument;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import graph.entities.MyClass;
 import graph.entities.Service;
 import parser.ParseResultServices;
-import utils.StringUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ExtractOperations {
 
     public static void extractAtServiceLevelInterfaces(ParseResultServices parseResultServices, Set<String> interfaces) {
         Map<Integer, Service> services = parseResultServices.getServices();
-        Map<String, MyClass> classes = parseResultServices.getClasses();
 
         for (Map.Entry<Integer, Service> service : services.entrySet()) {
             for (Map.Entry<String, MyClass> classe : service.getValue().getClasses().entrySet()) {
@@ -29,10 +23,7 @@ public class ExtractOperations {
                     for (MethodDeclaration md : classe.getValue().getVisitor().findAll(MethodDeclaration.class)) {
                         String methodName = md.getNameAsString();
 
-                        //if (!StringUtils.isMethodCallGetterOrSetter(methodName, md.getParameters().size())) {
                         classe.getValue().getOperations().add(methodName);
-                        //}
-
                     }
                 }
             }
@@ -66,20 +57,17 @@ public class ExtractOperations {
                         Expression expression = scope.get();
                         try {
                             ResolvedReferenceType resolvedReferenceType = expression.calculateResolvedType().asReferenceType();
-                            String methodName = methodCallExpr.getNameAsString();
                             String targetName = resolvedReferenceType.getQualifiedName();
                             MyClass target = classes.get(targetName);
 
                             if (source.getService() != null && target.getService() != null
                                     && source.getService().getId() != target.getService().getId()) {
-                                //if (!StringUtils.isMethodCallGetterOrSetter(methodCallExpr)) {
                                 target.getOperations().add(methodCallExpr.getNameAsString());
                             }
 
                         } catch (UnsolvedSymbolException e) {
                             // When it tries to resolve a class not explicitly present in the project. We don't care about those.
                         } catch (UnsupportedOperationException e) {
-                            //e.printStackTrace();
                         } catch (RuntimeException e) {
                             // TODO CRITICAL : reevaluate
                         }
@@ -102,6 +90,3 @@ public class ExtractOperations {
         }
     }
 }
-
-
-

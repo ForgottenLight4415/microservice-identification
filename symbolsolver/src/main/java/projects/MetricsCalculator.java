@@ -27,8 +27,6 @@ import java.util.*;
 public class MetricsCalculator {
 
 
-    private static String PROJECTS_ROOT;
-
     public static void extractClustersToFile(Map<Integer, Service> services, Project project) throws IOException {
 
         // WRITE TO GENERIC FILE
@@ -84,7 +82,6 @@ public class MetricsCalculator {
         List<ProjectMetrics> projectMetrics = new ArrayList<>();
 
         for (Project project : projects) {
-            String completePath = PROJECTS_ROOT + "/" + project.getRelativePath();
             System.out.println("Project complete path: " + Constants.PROJECT_PATH);
             List<CompilationUnit> compilationUnits = new Parser().parseProject(Path.of(Constants.PROJECT_PATH));
             List<String> interfaces = new ArrayList<>();
@@ -118,10 +115,6 @@ public class MetricsCalculator {
             String metricsFile = Constants.DIRECTORY + "/app/metrics/output_fosci.csv";
             System.out.println("Writting metrics to file path: " + metricsFile);
             writeServiceOperationsToFile(services, metricsFile);
-
-            // pm.setChm(calculateCHM(parseResultServices, interfaces));
-            // cleanUp(parseResultServices);
-            // pm.setChd(calculateCHD(parseResultServices, interfaces));
 
             projectMetrics.add(pm);
             extractClustersToFile(parseResultServices.getServices(), project);
@@ -207,20 +200,6 @@ public class MetricsCalculator {
         return opn;
     }
 
-    public double calculateCHM(ParseResultServices parseResultServices, List<String> interfaces) throws IOException {
-        Metric CHM = new CHM(parseResultServices, interfaces);
-        double chm = CHM.calculateService();
-        System.out.println("CHM Project: " + chm);
-        return chm;
-    }
-
-    public double calculateCHD(ParseResultServices parseResultServices, List<String> interfaces) throws IOException {
-        Metric CHD = new CHD(parseResultServices, new HashSet<>(interfaces));
-        double chd = CHD.calculateService();
-        System.out.println("CHD Project: " + chd);
-        return chd;
-    }
-
     public void writeToFile(ProjectMetrics metrics) throws IOException {
         // TODO : refactor
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -236,14 +215,13 @@ public class MetricsCalculator {
                 new FileWriter(path, true)  //Set true for append mode
         );
 
-        final String header = "IRN; OPN; CHM; CHD; Commit hash ;Date;";
+        final String header = "IRN; OPN; Commit hash ;Date;";
 
         if (writeHeader) {
             writer.write("ProjectName; " + header);
         }
         String line = metrics.getProject().getName() + ";" + metrics.getIrn() + ";" + metrics.getOpn() + ";" +
-                String.format("%.3f", metrics.getChm()) + ";" +
-                String.format("%.3f", metrics.getChd()) + ";" + metrics.getProject().getCommitHash() + " ;" + date + ";";
+                metrics.getProject().getCommitHash() + " ;" + date + ";";
 
         writer.newLine();
         writer.write(line);
@@ -263,8 +241,7 @@ public class MetricsCalculator {
         }
 
         String projectLine = metrics.getIrn() + ";" + metrics.getOpn() + ";" +
-                String.format("%.3f", metrics.getChm()) + ";" +
-                String.format("%.3f", metrics.getChd()) + ";" + metrics.getProject().getCommitHash() + " ;" + date + ";";
+                metrics.getProject().getCommitHash() + " ;" + date + ";";
 
         projectWriter.newLine();
         projectWriter.write(projectLine);
@@ -283,10 +260,6 @@ public class MetricsCalculator {
         }
 
         String content = "Commit hash: " + metrics.getProject().getCommitHash() + "\nIRN: " + metrics.getIrn() + "\nOPN: " + metrics.getOpn();
-/*
-                + "\nCHM: " + metrics.getChm() +
-                "\nCHD: " + metrics.getChd()
-*/
 
         projectWriterService.newLine();
         projectWriterService.write(content);

@@ -34,10 +34,6 @@ public class Parse {
         return new ParseResultServices(classes, services);
     }
 
-    public Map<String, MyClass> parseClasses(List<CompilationUnit> compilationUnits) {
-        return extractClasses(compilationUnits);
-    }
-
     public Map<String, MyClassDTO> completeParse(List<CompilationUnit> compilationUnits) {
         Map<String, MyClass> classes = extractClasses(compilationUnits);
         System.out.println("Parsed classes");
@@ -157,7 +153,6 @@ public class Parse {
             List<VariableDeclarator> variables = new ArrayList<>();
             List<MethodCallExpr> methodCallInvocations = new ArrayList<>();
             ClassOrInterfaceDeclaration visitor = myClass.getVisitor();
-            // visitor.accept(new FieldDeclarationVisitor(), fields);
             visitor.accept(new AnnotationVisitor(), annotations);
             visitor.accept(new VariableDeclaratorVisitor(), variables);
             visitor.accept(new MethodCallExprVisitor(), methodCallInvocations);
@@ -183,7 +178,3 @@ public class Parse {
     }
 
 }
-
-
-// variables.name
-// variables.type -> para dar o resolve

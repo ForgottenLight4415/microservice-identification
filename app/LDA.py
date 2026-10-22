@@ -1,14 +1,6 @@
-import re
-import operator
-import time
 import gensim
-import logging
-import pathlib
-import operator
 import numpy as np
 import pyLDAvis.gensim
-import matplotlib.pyplot as plt
-
 
 from kneed import KneeLocator
 from WeightType import WeightType
@@ -17,12 +9,9 @@ from nltk.tokenize import RegexpTokenizer
 from stop_words import get_stop_words
 from nltk.stem.porter import PorterStemmer
 from gensim import corpora, models
-from gensim.models import CoherenceModel, nmf
+from gensim.models import CoherenceModel
 from StringUtils import StringUtils
 from Settings import Settings
-from gensim.test.utils import datapath
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.decomposition import NMF
 
 
 def apply_lda_to_classes(graph, classes, num_topics=0, pre_process=False):
@@ -81,9 +70,6 @@ def apply_lda_to_classes(graph, classes, num_topics=0, pre_process=False):
                 f.write(f"{classe}\n")
             f.write("\n")
 
-    # colors = Clustering.create_colors(services.values())
-    # Graph.draw(graph, colors)
-
     # Create cluster string to measure metrics
     clusters = []
     for service in services:
@@ -111,12 +97,6 @@ def clear_documents(docs):
 
     # Create p_stemmer of class PorterStemmer
     p_stemmer = PorterStemmer()
-
-    # with open(f"{Settings.DIRECTORY}/data/words/{Settings.PROJECT_NAME}_{Settings.ID}", 'w') as f:
-    #     for d in docs:
-    #         f.write(d + "\n")
-
-    #     f.write("\n")
 
     # Clean text based on java stop words
     docs_content = []
@@ -171,12 +151,6 @@ def compute_coherence_values(dictionary, corpus, texts, limit, start=4, step=3):
     model_list = []
     num_topics_list = []
 
-# Tf-idf
- #   docs = [' '.join(word) for word in texts]
- #   tfidf = TfidfVectorizer(max_df=0.9, stop_words='english')
-    # accepts a list of documents of strings
- #   tf = tfidf.fit_transform(docs)
-
     for num_topics in range(start, limit, step):
 
         print(f"\n\nRunning LDA for {num_topics} topics")
@@ -209,9 +183,6 @@ def compute_coherence_values(dictionary, corpus, texts, limit, start=4, step=3):
 
         # Same as before, duplicated above
         model_list.append(top_model)
-        # coherencemodel = CoherenceModel(
-        # model=top_model, texts=texts, dictionary=dictionary, coherence='c_v')
-        # coherence_values.append(coherencemodel.get_coherence())
         coherence_values.append(max(temp_coherences))
         num_topics_list.append(num_topics)
 
@@ -264,22 +235,11 @@ def find_best_lda(docs):
     for model, coherence, k in zip(model_list, coherence_values, num_topics):
         print(f"k {k} - coherence {coherence} lda_model {model}")
 
-    # plt.plot(x, coherence_values)
-    # plt.xlabel('number of topics')
-    # plt.ylabel('topic coherence')
-    # plt.show()
-
     S = 5
     best_topic = None
     while best_topic == None and S > 0:
         knee = KneeLocator(x, coherence_values, curve='concave',
                            direction='increasing', S=S)
-
-        # Plot knee of coherence over number of topics
-        # knee.plot_knee()
-        # plt.xlabel('number of topics')
-        # plt.ylabel('topic coherence')
-        # plt.show()
 
         best_topic = knee.knee
 
@@ -301,13 +261,8 @@ def find_best_lda(docs):
             break
     topics_per_doc = []
 
-    # topics_per_doc = [lda_model.get_document_topics(corp) for corp in corpus]
-
     for c in lda_model[corpus]:
         topics_per_doc.append(c)
-
-    # print(f"Topics per doc: {topics_per_doc}")
-    # print(f"Topics: {lda_model.show_topics()}")
 
     return topics_per_doc, best_topic
 
