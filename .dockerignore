@@ -1,0 +1,4 @@
+# Send only what the Dockerfile copies (keeps the 500 MB jar, .git and runs/ out of the build)
+*
+!app/requirements.txt
+!symbolsolver/pom.xml
