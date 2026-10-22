@@ -1,3 +1,6 @@
+# MacOS files
+.DS_Store
+
 # Build output
 target/
 dependency-reduced-pom.xml
