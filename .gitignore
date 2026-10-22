@@ -25,11 +25,3 @@ clustering.txt
 output.json
 results.csv
 app/metrics/output_fosci.csv
-
-# githubextraction outputs
-githubextraction/repos.txt
-githubextraction/repos_data.txt
-githubextraction/projects_ready.csv
-githubextraction/projects_ready.csv.bck
-githubextraction/results.csv
-githubextraction/results_filtered_1.csv
