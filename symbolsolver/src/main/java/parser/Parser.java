@@ -5,6 +5,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
+import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import com.github.javaparser.utils.ParserCollectionStrategy;
 import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
@@ -20,12 +21,14 @@ public class Parser {
         final ProjectRoot projectRoot = new ParserCollectionStrategy().collect(path);
         final List<CompilationUnit> compilationUnits = new ArrayList<>();
 
-        for (SourceRoot sr : projectRoot.getSourceRoots()) {
-            // The SymbolSolver has to receive a SourceRoot instead of a Project Root!
-            CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
-            combinedTypeSolver.add(new JavaParserTypeSolver(sr.getRoot()));
-            JavaSymbolSolver symbolSolver = new JavaSymbolSolver(combinedTypeSolver);
+        CombinedTypeSolver shared = new CombinedTypeSolver();
+        shared.add(new ReflectionTypeSolver()); // JDK classes
+        for (SourceRoot sr : projectRoot.getSourceRoots())
+            shared.add(new JavaParserTypeSolver(sr.getRoot()));
+        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(shared);
+            
 
+        for (SourceRoot sr : projectRoot.getSourceRoots()) {
             sr.getParserConfiguration().setSymbolResolver(symbolSolver);
             List<ParseResult<CompilationUnit>> parseResults = sr.tryToParse();
 
