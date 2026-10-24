@@ -88,7 +88,7 @@ class Graph:
                 # ('CLASS_NAME', '{TYPE}')  TYPE = {'EXTENDS', 'IMPLEMENTS', 'NORMAL'}
 
                 # Ignore duplicates (when a class references itself)
-                if qualified_name == dependency_name:
+                if qualified_name == dependency_name or dependency_name not in classes:
                     continue
 
                 edge_data = graph.get_edge_data(
